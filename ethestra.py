@@ -8,25 +8,26 @@ import signal
 
 gobject.threads_init()
 	
+DISABLE_SNIFFER = 1	
+	
 class Ethestra():
-	def __init__(self, device_name, channels_to_add):
+	def __init__(self, device_name, channels_to_add, tempo = 100):
 		gobject.io_add_watch(sys.stdin,
                      gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
                      self.InputHandler)
 		self.stop_flag = 0
 
 		self.seq = sequencer.Seq(device_name)
-		self.seq.SetTempo(100)
+		self.seq.SetTempo(tempo)
 		self.instruments = []
 		for channel in channels_to_add:
 			print channel
 			self.instruments.append(self.Instrument(self.seq, channel[0], channel[1], channel[2]))
 		self.seq.PlayBar()
 		self.seq.connect("bar-fin", self.FinishedBar)
-		#self.sniffer_thread = Thread(target=self.StartSniffer, args=())
-		#self.sniffer_thread.start()
-		print self.seq.GetChannel(2).name
-		exit(0)
+		if not DISABLE_SNIFFER:
+			self.sniffer_thread = Thread(target=self.StartSniffer, args=())
+			self.sniffer_thread.start()
 		Loop = gobject.MainLoop()
 		Loop.run()
 		
@@ -45,6 +46,7 @@ class Ethestra():
 			return False
 			
 	def FinishedBar(self, e):
+		print e.GetChannel(1).pattern
 		print e.GetChannel(2).pattern
 		
 	def PacketHandler(self, pkt):
@@ -60,4 +62,4 @@ class Ethestra():
 channels_to_add = [
 (1, "ARP Instrument", "IS ARP"),
 (2, "TCP Instrument", "IS TCP"),]
-ethestra = Ethestra("ZynAddSubFX", channels_to_add)
+ethestra = Ethestra("ZynAddSubFX", channels_to_add, tempo=100)

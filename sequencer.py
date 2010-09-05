@@ -104,6 +104,9 @@ class Seq(gobject.GObject):
 		
 	def SetTempo(self, tempo):
 		self.tempo = tempo
+		
+	def GetTempo(self):
+		return self.tempo
 
 	class MidiDevice():
 		def __init__(self, device_name = "ZynAddSubFX"):
@@ -112,7 +115,6 @@ class Seq(gobject.GObject):
 			self.OpenDevice()
 
 		def OpenDevice(self):
-			""" """
 			for loop in range(portmidizero.CountDevices()):
 				interf,name,inp,outp,opened = portmidizero.GetDeviceInfo(loop)
 				if outp == 1 and name == self.device_name:
@@ -124,7 +126,10 @@ class Seq(gobject.GObject):
 			self.device.WriteShort(0x80,0x50+3,0x60)
 			
 		def Write(self, mess, note, velo):
-			self.device.WriteShort(mess, note, velo)
+			try:
+				self.device.WriteShort(mess, note, velo)
+			except AttributeError:
+				pass
 	
 	class Channel(gobject.GObject):
 		
