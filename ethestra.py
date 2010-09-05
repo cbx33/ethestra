@@ -14,14 +14,19 @@ class Ethestra():
                      gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
                      self.InputHandler)
 		self.stop_flag = 0
-		self.sniffer_thread = Thread(target=self.StartSniffer, args=())
-		self.sniffer_thread.start()
+
 		self.seq = sequencer.Seq(device_name)
 		self.seq.SetTempo(100)
-		self.seq.AddChannel(1, name="Totoro")
-		self.seq.AddChannel(2)
+		self.instruments = []
+		for channel in channels_to_add:
+			print channel
+			self.instruments.append(self.Instrument(self.seq, channel[0], channel[1], channel[2]))
 		self.seq.PlayBar()
 		self.seq.connect("bar-fin", self.FinishedBar)
+		#self.sniffer_thread = Thread(target=self.StartSniffer, args=())
+		#self.sniffer_thread.start()
+		print self.seq.GetChannel(2).name
+		exit(0)
 		Loop = gobject.MainLoop()
 		Loop.run()
 		
@@ -46,8 +51,12 @@ class Ethestra():
 		print pkt.summary()
 	
 	class Instrument():
-		def __init__(self):
-			True
+		def __init__(self, seq, chan, name, filter):
+			self.chan = chan
+			self.name = name
+			self.filter = filter
+			seq.AddChannel(chan, name=name)
+			
 channels_to_add = [
 (1, "ARP Instrument", "IS ARP"),
 (2, "TCP Instrument", "IS TCP"),]
