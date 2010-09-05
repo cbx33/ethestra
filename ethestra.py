@@ -7,26 +7,16 @@ import random
 import signal
 
 gobject.threads_init()
-
-fla = 0
-
-
-
-
-def handler(pkt):
-    print pkt.summary()
 	
-
-
 class Ethestra():
-	def __init__(self):
+	def __init__(self, device_name, channels_to_add):
 		gobject.io_add_watch(sys.stdin,
                      gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
                      self.InputHandler)
 		self.stop_flag = 0
 		self.sniffer_thread = Thread(target=self.StartSniffer, args=())
 		self.sniffer_thread.start()
-		self.seq = sequencer.Seq()
+		self.seq = sequencer.Seq(device_name)
 		self.seq.SetTempo(100)
 		self.seq.AddChannel(1, name="Totoro")
 		self.seq.AddChannel(2)
@@ -36,7 +26,7 @@ class Ethestra():
 		Loop.run()
 		
 	def StartSniffer(self):
-		sniff(prn=handler, filter="ip", store=0, stopper=self.StopperCheck, stopperTimeout=1)
+		sniff(prn=self.PacketHandler, filter="ip", store=0, stopper=self.StopperCheck, stopperTimeout=1)
 
 	def InputHandler(self, fd, io_condition):
 		self.stop_flag = 1
@@ -51,6 +41,11 @@ class Ethestra():
 			
 	def FinishedBar(self, e):
 		print e.GetChannel(2).pattern
+		
+	def PacketHandler(self, pkt):
+		print pkt.summary()
 	
-
-ethestra = Ethestra()
+channels_to_add = [
+(1, "ARP Instrument", "IS ARP"),
+(2, "TCP Instrument", "IS TCP"),]
+ethestra = Ethestra("ZynAddSubFX", channels_to_add)

@@ -13,7 +13,8 @@ class Seq(gobject.GObject):
 	"""
 
 	class MidiDevice():
-		def __init__(self):
+		def __init__(self, device_name = "ZynAddSubFX"):
+			self.device_name = device_name
 			self.device = None
 			self.OpenDevice()
 
@@ -21,7 +22,7 @@ class Seq(gobject.GObject):
 			""" """
 			for loop in range(portmidizero.CountDevices()):
 				interf,name,inp,outp,opened = portmidizero.GetDeviceInfo(loop)
-				if outp == 1 and name == "ZynAddSubFX":
+				if outp == 1 and name == self.device_name:
 				   self.device = portmidizero.Output(loop,0)
 
 		def TestDevice(self):
@@ -96,12 +97,12 @@ class Seq(gobject.GObject):
 			sorted_pattern = sorted(pattern, key=lambda pat: pat[0])
 			self.pattern = sorted_pattern
 	
-	def __init__(self):
+	def __init__(self, device_name = "ZynAddSubFX"):
 		self.tempo = 120
 		self.channels = []
 		self.control_channel = 1
 		self.control_channel_cur = 0
-		self.device = self.MidiDevice()
+		self.device = self.MidiDevice(device_name)
 		self.global_pattern = []
 		gobject.GObject.__init__(self)
 		gobject.type_register(self.Channel)
