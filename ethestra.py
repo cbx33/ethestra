@@ -28,6 +28,7 @@ class Ethestra():
 		if not DISABLE_SNIFFER:
 			self.sniffer_thread = Thread(target=self.StartSniffer, args=())
 			self.sniffer_thread.start()
+		self.seq.DeleteChannel(1)
 		Loop = gobject.MainLoop()
 		Loop.run()
 		

@@ -2,6 +2,9 @@ import portmidizero
 import time
 import gobject
 
+#TODO Check that moving Drum to 64 resolution in a bar pattern yields 
+#expected results
+
 DRUM_PATTERN = ([
 	(0, 0x24, 0x60, 4), 
 	(2, 0x24, 0x60, 4), 
@@ -59,6 +62,12 @@ class Seq(gobject.GObject):
 			self.emit("bar-fin")
 		
 	def DeleteChannel(self, chan):
+		if chan == self.control_channel:
+			raise self.DeleteControl(chan)
+		else:
+			for i in self.channels:
+				if i.channel == chan:
+					self.channels.remove(i)
 		"Not Yet Implemented"
 
 	def PlayBar(self):
@@ -107,6 +116,13 @@ class Seq(gobject.GObject):
 		
 	def GetTempo(self):
 		return self.tempo
+		
+	class DeleteControl(Exception):
+		def __init__(self, value):
+			self.value = value
+		def __str__(self):
+			return "Can't delete control channel (" + repr(self.value) + ")"
+
 
 	class MidiDevice():
 		def __init__(self, device_name = "ZynAddSubFX"):
