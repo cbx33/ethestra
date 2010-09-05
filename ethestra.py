@@ -52,44 +52,37 @@ def handler(pkt):
 def nuts(e):
 	print e.GetChannel(2).pattern
 
-#sniff(prn=handler, filter="ip", store=0)
-#sniff(prn=handler, store=0)
 seq.AddChannel(1, name="Totoro")
 seq.AddChannel(2)
 seq.PlayBar()
 seq.connect("bar-fin", nuts)
 
-def stopperCheck():
-	global fla
-	if fla:
-		return True
-	else:
-		return False
-
-def blarg(yikes):
-		sniff(prn=handler, filter="ip", store=0, stopper=stopperCheck, stopperTimeout=1)
 
 class Ethestra():
 	def __init__(self):
-		True
-	def start(self):
-		sniff(prn=handler, filter="ip", store=0, stopper=stopperCheck, stopperTimeout=1)
-
-#t = Thread(target=blarg, args=("o",))
-ethestra = Ethestra()
-
-t = Thread(target=ethestra.start, args=())
-t.start()
-
-def input_handler(fd, io_condition):
-	global fla
-	fla = 1
-	t.join()
-	exit(0)
-
-gobject.io_add_watch(sys.stdin,
+		gobject.io_add_watch(sys.stdin,
                      gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
-                     input_handler)
+                     self.input_handler)
+		self.stop_flag = 0
+		self.sniffer_thread = Thread(target=self.Start, args=())
+		self.sniffer_thread.start()
+		
+	def Start(self):
+		sniff(prn=handler, filter="ip", store=0, stopper=self.stopperCheck, stopperTimeout=1)
+
+	def input_handler(self, fd, io_condition):
+		self.stop_flag = 1
+		self.sniffer_thread.join()
+		exit(0)
+		
+	def stopperCheck(self):
+		if self.stop_flag:
+			return True
+		else:
+			return False
+
+
+ethestra = Ethestra()
 
 Loop = gobject.MainLoop()
 
