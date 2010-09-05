@@ -2,6 +2,29 @@ import portmidizero
 import time
 import gobject
 
+DRUM_PATTERN = ([
+	(0, 0x24, 0x60, 4), 
+	(2, 0x24, 0x60, 4), 
+	(8, 0x24, 0x60, 4), 
+
+	(16, 0x27, 0x60, 4), 
+
+	(0, 0x2A, 0x60, 4),
+	(8, 0x2A, 0x60, 4),
+	(16, 0x2A, 0x60, 4),
+	(24, 0x2A, 0x60, 4),
+	(32, 0x2A, 0x60, 4),
+	(40, 0x2A, 0x60, 4),
+	(48, 0x2A, 0x60, 4),
+	(56, 0x2A, 0x60, 4),
+	])
+	
+BASIC_PATTERN = [
+	(48, 0x50, 0x60, 4), 
+	(32, 0x53, 0x60, 4), 
+	(16, 0x50, 0x60, 4), 
+	(0, 0x57, 0x60, 4)]
+
 class Seq(gobject.GObject):
 	
 	__gsignals__ = {
@@ -182,9 +205,6 @@ def Demo():
 	seq.AddChannel(2)
 	seq.AddChannel(3)
 	seq.AddChannel(10, name="Drums", modable=0)
-	#seq.GetChannel(1).Mute()
-	#seq.GetChannel(2).Mute()
-	#seq.GetChannel(3).Mute()
 	seq.GetChannel(3).transpose = -36
 
 	seq.GetChannel(2).AddPattern([(48, 0x50, 0x60, 4), (32, 0x53, 0x60, 4), (16, 0x50, 0x60, 4), (0, 0x57, 0x60, 4)])
