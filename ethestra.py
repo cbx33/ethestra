@@ -45,6 +45,9 @@ class Ethestra():
 	def PacketHandler(self, pkt):
 		print pkt.summary()
 	
+	class Instrument():
+		def __init__(self):
+			True
 channels_to_add = [
 (1, "ARP Instrument", "IS ARP"),
 (2, "TCP Instrument", "IS TCP"),]
