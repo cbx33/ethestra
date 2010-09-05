@@ -30,10 +30,6 @@ class Seq(gobject.GObject):
 	__gsignals__ = {
         'bar-fin': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
 		}
-	"""__gsignals__ = {
-        'die': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
-		}
-	"""
 
 	class MidiDevice():
 		def __init__(self, device_name = "ZynAddSubFX"):
@@ -57,12 +53,10 @@ class Seq(gobject.GObject):
 			self.device.WriteShort(mess, note, velo)
 	
 	class Channel(gobject.GObject):
-		"""
+		
 		__gsignals__ = {
-        'bar-end' : (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                            (gobject.TYPE_FLOAT,))
-        }
-        """
+		'bar-end': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE, ()),
+			}
         
 		def __init__(self, device, channel, tempo, name="Blank", modable=1):
 			self.name = name
@@ -129,7 +123,6 @@ class Seq(gobject.GObject):
 		self.global_pattern = []
 		gobject.GObject.__init__(self)
 		gobject.type_register(self.Channel)
-		gobject.signal_new("bar-end", self.Channel, gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE, ())
 		print "Starting Sequencer..."
 
 	def AddChannel(self, chan, name="Blank", modable=1):
@@ -156,8 +149,7 @@ class Seq(gobject.GObject):
 		This code implemented a single scheduler for notes, but this 
 		does not work if the bars are different lengths, which could
 		be the case
-		"""
-		"""
+
 		temp_channel_data = []
 		for channel in self.channels:
 			temp_channel_data.append([channel.channel, channel.pattern])
