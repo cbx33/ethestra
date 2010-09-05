@@ -1,5 +1,6 @@
 from scapy.all import *
 import sequencer
+import packetparser
 import gobject
 from threading import Thread
 import random
@@ -27,6 +28,7 @@ mod12 = 0
 
 def handler(pkt):
     print pkt.summary()
+    """
     #print pkt.type
     global seq
     
@@ -44,7 +46,7 @@ def handler(pkt):
 	    if pkt.dport == 5222 or pkt.sport == 5222:
 		print "CHAT"
 		seq.GetChannel(2).pattern.append([random.random()*64, 0x2A, 0x60, 4])
-
+	"""
 
 	
 def nuts(e):
@@ -67,7 +69,16 @@ def stopperCheck():
 def blarg(yikes):
 		sniff(prn=handler, filter="ip", store=0, stopper=stopperCheck, stopperTimeout=1)
 
-t = Thread(target=blarg, args=("o",))
+class Ethestra():
+	def __init__(self):
+		True
+	def start(self):
+		sniff(prn=handler, filter="ip", store=0, stopper=stopperCheck, stopperTimeout=1)
+
+#t = Thread(target=blarg, args=("o",))
+ethestra = Ethestra()
+
+t = Thread(target=ethestra.start, args=())
 t.start()
 
 def input_handler(fd, io_condition):
