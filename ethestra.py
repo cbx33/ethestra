@@ -10,8 +10,7 @@ gobject.threads_init()
 
 fla = 0
 
-seq = sequencer.Seq()
-seq.SetTempo(100)
+
 
 ch1 = 0
 ch2 = 0
@@ -52,10 +51,7 @@ def handler(pkt):
 def nuts(e):
 	print e.GetChannel(2).pattern
 
-seq.AddChannel(1, name="Totoro")
-seq.AddChannel(2)
-seq.PlayBar()
-seq.connect("bar-fin", nuts)
+
 
 
 class Ethestra():
@@ -66,6 +62,14 @@ class Ethestra():
 		self.stop_flag = 0
 		self.sniffer_thread = Thread(target=self.Start, args=())
 		self.sniffer_thread.start()
+		self.seq = sequencer.Seq()
+		self.seq.SetTempo(100)
+		self.seq.AddChannel(1, name="Totoro")
+		self.seq.AddChannel(2)
+		self.seq.PlayBar()
+		self.seq.connect("bar-fin", nuts)
+		Loop = gobject.MainLoop()
+		Loop.run()
 		
 	def Start(self):
 		sniff(prn=handler, filter="ip", store=0, stopper=self.stopperCheck, stopperTimeout=1)
@@ -80,10 +84,6 @@ class Ethestra():
 			return True
 		else:
 			return False
-
+	
 
 ethestra = Ethestra()
-
-Loop = gobject.MainLoop()
-
-Loop.run()
