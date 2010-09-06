@@ -8,7 +8,7 @@ import signal
 
 gobject.threads_init()
 	
-DISABLE_SNIFFER = 1	
+DISABLE_SNIFFER = 0
 	
 class Ethestra():
 	def __init__(self, device_name, channels_to_add, tempo = 100):
@@ -32,7 +32,7 @@ class Ethestra():
 		Loop.run()
 		
 	def StartSniffer(self):
-		sniff(prn=self.PacketHandler, filter="ip", store=0, stopper=self.StopperCheck, stopperTimeout=1)
+		sniff(prn=self.PacketHandler, store=0, stopper=self.StopperCheck, stopperTimeout=1)
 
 	def InputHandler(self, fd, io_condition):
 		self.stop_flag = 1
@@ -46,11 +46,16 @@ class Ethestra():
 			return False
 			
 	def FinishedBar(self, e):
-		print e.GetChannel(1).pattern
-		print e.GetChannel(2).pattern
+		#print e.GetChannel(1).pattern
+		#print e.GetChannel(2).pattern
+		for instrument in self.instruments:
+			print instrument.chan, instrument.name, instrument.packet_count
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
+		for instrument in self.instruments:
+			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
+				instrument.packet_count += 1
 		
 	def AddInstrument(self, chan, name, filter):
 		self.instruments.append(self.Instrument(self.seq, chan, name, filter))		
@@ -60,6 +65,9 @@ class Ethestra():
 			self.chan = chan
 			self.name = name
 			self.filter = filter
+			self.compiled_filter = packetparser.ParseFilter(self.filter)[0]
+			self.packet_count = 0
+			print self.compiled_filter
 			seq.AddChannel(chan, name=name)
 			
 channels_to_add = [
