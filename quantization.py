@@ -2,17 +2,21 @@ import math
 import random
 
 DEFAULT_MAPPINGS = [(0.99, 1), (0.95, 4), (0.8, 8), (0, 16)]
+DEBUG = 0
 
 def __process_mod(p, quant):
 	mod = 0.0
 	mod2 = 0.0
 	while int(p-mod) % quant != 0:
-		#print p, int(p-mod), p % quant
+		if DEBUG:
+			print p, int(p-mod), p % quant
 		mod = mod - 1
 	while int(p-mod2) % quant != 0:
-		#print p, int(p-mod2), p % quant
+		if DEBUG:
+			print p, int(p-mod2), p % quant
 		mod2 = mod2 + 1
-	#print mod, mod2, min(abs(mod), abs(mod2)), int(p-min(abs(mod), abs(mod2)))
+	if DEBUG:
+		print mod, mod2, min(abs(mod), abs(mod2)), int(p-min(abs(mod), abs(mod2)))
 	return int(p-min(abs(mod), abs(mod2)))
 
 def ReturnNote(mappings = DEFAULT_MAPPINGS, bar_length = 4, bar_res = 16):
