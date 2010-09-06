@@ -31,7 +31,6 @@ def Operation(data, value1, operator, value2 = None):
 			except (KeyError, AttributeError):
 				return False
 		elif "#" in value1:
-			#THIS WILL NEED TO CHANGE to the getattr for scapy
 			value1 = value1[1:]
 			value1 = getattr(scapy.all, value1)
 	if type(value2).__name__ == "str":
@@ -100,15 +99,10 @@ if __name__ == "__main__":
 	packet = Packet()
 
 	stri = "((*ip == 10.0.0.0) AND ((*sport < 3) OR (*proto == TCP))) AND (*proto == TCP)"
-	#stri = "(*ip == 10.0.0.0 AND *sport < 3) OR *proto == TCP"
-	stri = "sport == sport"
-	stri = "(IS ARP AND dst == 10.0.0.0) OR IS LLC OR IS ARP AND chump == 9"
-	stri = "IS LLC"
 
 	arrays = ParseFilter(stri)
 	print arrays
 	print len(arrays[0])
 	print len(arrays[0][0])
 	print "Sending:", arrays[0]
-	#print arrays
 	print FilterCheck(arrays[0], packet)
