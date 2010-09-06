@@ -156,7 +156,10 @@ class Seq(gobject.GObject):
 		def __init__(self, device, channel, tempo, name="Blank", modable=1):
 			self.name = name
 			self.modable = modable
-			self.pattern = [(0, 0x50, 0x60, 4), (16, 0x53, 0x60, 4), (32, 0x50, 0x60, 4), (48, 0x57, 0x60, 4)]
+			if channel == 10:
+				self.pattern = DRUM_PATTERN
+			else:
+				self.pattern = BASIC_PATTERN
 			self.tempo = tempo
 			self.channel = channel
 			self.device = device
