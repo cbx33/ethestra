@@ -53,13 +53,14 @@ class Ethestra():
 			
 	def FinishedBar(self, e):
 		for instrument in self.instruments:
-			print instrument.chan, instrument.name, instrument.packet_count
+			print instrument.chan, instrument.name, instrument.packet_count, instrument.channel.pattern
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
-				print quantization.ReturnNote(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
+				note_position = quantization.ReturnNote(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
+				instrument.channel.pattern.append((note_position, 0x50, 0x60, 4))
 				instrument.packet_count += 1
 		
 	def AddInstrument(self, chan, name, filter):
