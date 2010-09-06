@@ -5,10 +5,12 @@ import gobject
 from threading import Thread
 import random
 import signal
+import quantization
 
 #TODO
 # Add trigger filters which make drastic change, such as reorder instruments
 #	and have a defined cool-off period to prevent multiple activations
+# Add Drum Channel handling
 
 gobject.threads_init()
 	
@@ -50,8 +52,6 @@ class Ethestra():
 			return False
 			
 	def FinishedBar(self, e):
-		#print e.GetChannel(1).pattern
-		#print e.GetChannel(2).pattern
 		for instrument in self.instruments:
 			print instrument.chan, instrument.name, instrument.packet_count
 		
@@ -59,6 +59,7 @@ class Ethestra():
 		print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
+				print quantization.ReturnNote(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
 				instrument.packet_count += 1
 		
 	def AddInstrument(self, chan, name, filter):
@@ -71,8 +72,8 @@ class Ethestra():
 			self.filter = filter
 			self.compiled_filter = packetparser.ParseFilter(self.filter)[0]
 			self.packet_count = 0
-			print self.compiled_filter
 			seq.AddChannel(chan, name=name)
+			self.channel = seq.GetChannel(chan)
 			
 channels_to_add = [
 (1, "ARP Instrument", "IS ARP"),
