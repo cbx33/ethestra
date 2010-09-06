@@ -20,16 +20,6 @@ expression = operatorPrecedence( operand,
      (operator, 2, opAssoc.RIGHT),]
     )
 
-class Packet():
-	def __init__(self):
-		self.dst = "10.0.0.0"
-		self.src = "10.0.0.0"
-		self.dport = 0
-		self.sport = 4
-		self.proto = "TCP"
-	def __getitem__(self, name):
-		return vars(self)[name]
-		
 def Operation(data, value1, operator, value2 = None):
 	if DEBUG:
 		print "I've been called with", operator,":", value1,":", value2
@@ -98,6 +88,15 @@ def ParseFilter(filter_string):
 	return expression.parseString(filter_string)
 		
 if __name__ == "__main__":
+	class Packet():
+		def __init__(self):
+			self.dst = "10.0.0.0"
+			self.src = "10.0.0.0"
+			self.dport = 0
+			self.sport = 4
+			self.proto = "TCP"
+		def __getitem__(self, name):
+			return vars(self)[name]
 	packet = Packet()
 
 	stri = "((*ip == 10.0.0.0) AND ((*sport < 3) OR (*proto == TCP))) AND (*proto == TCP)"
