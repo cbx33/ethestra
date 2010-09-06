@@ -22,13 +22,12 @@ class Ethestra():
 		self.instruments = []
 		for channel in channels_to_add:
 			print channel
-			self.instruments.append(self.Instrument(self.seq, channel[0], channel[1], channel[2]))
+			self.AddInstrument(channel[0], channel[1], channel[2])
 		self.seq.PlayBar()
 		self.seq.connect("bar-fin", self.FinishedBar)
 		if not DISABLE_SNIFFER:
 			self.sniffer_thread = Thread(target=self.StartSniffer, args=())
 			self.sniffer_thread.start()
-		self.seq.DeleteChannel(1)
 		Loop = gobject.MainLoop()
 		Loop.run()
 		
@@ -52,6 +51,9 @@ class Ethestra():
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
+		
+	def AddInstrument(self, chan, name, filter):
+		self.instruments.append(self.Instrument(self.seq, chan, name, filter))		
 	
 	class Instrument():
 		def __init__(self, seq, chan, name, filter):
