@@ -6,6 +6,10 @@ from threading import Thread
 import random
 import signal
 
+#TODO
+# Add trigger filters which make drastic change, such as reorder instruments
+#	and have a defined cool-off period to prevent multiple activations
+
 gobject.threads_init()
 	
 DISABLE_SNIFFER = 0

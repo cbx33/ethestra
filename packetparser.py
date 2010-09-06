@@ -5,7 +5,7 @@ DEBUG = 0
 
 integer = Word(nums).setParseAction(lambda t:int(t[0]))
 ipaddress = Combine(Word(nums) + ('.' + Word(nums))*3)
-parameter = oneOf('ip sport dport proto type chump').setParseAction(lambda t:"*"+t[0])
+parameter = oneOf('src dst sport dport proto type chump').setParseAction(lambda t:"*"+t[0])
 proto = oneOf('TCP UDP IP')
 pkttype = oneOf('ICMP LLC ARP').setParseAction(lambda t:"#"+t[0])
 operand = ipaddress | integer | parameter | proto | pkttype
@@ -22,7 +22,8 @@ expression = operatorPrecedence( operand,
 
 class Packet():
 	def __init__(self):
-		self.ip = "10.0.0.0"
+		self.dst = "10.0.0.0"
+		self.src = "10.0.0.0"
 		self.dport = 0
 		self.sport = 4
 		self.proto = "TCP"
@@ -102,7 +103,7 @@ if __name__ == "__main__":
 	stri = "((*ip == 10.0.0.0) AND ((*sport < 3) OR (*proto == TCP))) AND (*proto == TCP)"
 	#stri = "(*ip == 10.0.0.0 AND *sport < 3) OR *proto == TCP"
 	stri = "sport == sport"
-	stri = "(IS ARP AND ip == 10.0.0.0) OR IS LLC OR IS ARP AND chump == 9"
+	stri = "(IS ARP AND dst == 10.0.0.0) OR IS LLC OR IS ARP AND chump == 9"
 	stri = "IS LLC"
 
 	arrays = ParseFilter(stri)
