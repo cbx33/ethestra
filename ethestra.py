@@ -60,7 +60,7 @@ class Ethestra():
 		print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
-				note_position = qtz.ReturnNote(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
+				note_position = qtz.ReturnNotePosition(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
 				instrument.channel.pattern.append((note_position, 0x50, 0x60, 4))
 				instrument.packet_count += 1
 		

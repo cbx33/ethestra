@@ -8,6 +8,8 @@ def __process_mod_stream(p, quant):
 	di = p % quant
 	if di > quant/2:
 		di = -(quant - di)
+	if DEBUG:
+		print p, i, di, p+di, p - di
 	return p - di
 
 """
@@ -27,7 +29,7 @@ def __process_mod(p, quant):
 	return int(p-min(abs(mod), abs(mod2)))
 """
 
-def ReturnNote(mappings = DEFAULT_MAPPINGS, bar_length = 4, bar_res = 16):
+def ReturnNotePosition(mappings = DEFAULT_MAPPINGS, bar_length = 4, bar_res = 16):
 
 	p = random.random() * bar_res * bar_length
 	j = random.random()
