@@ -50,8 +50,9 @@ class Ethestra():
 			instrument.history.append(instrument.packet_count)
 			if len(instrument.history) > instrument.history_length:
 				instrument.history.pop(0)
+			instrument.packet_ave = sum(instrument.history) / instrument.history_length
 			instrument.ResetPacketCount()
-			print instrument.history
+			print instrument.history, instrument.packet_ave
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
@@ -72,6 +73,7 @@ class Ethestra():
 			self.filter = filter
 			self.compiled_filter = packetparser.ParseFilter(self.filter)[0]
 			self.packet_count = 0
+			self.packet_ave = 0
 			self.history = []
 			seq.AddChannel(chan, name=name)
 			self.channel = seq.GetChannel(chan)
