@@ -19,9 +19,6 @@ class Ethestra():
 		self.seq = sequencer.Seq(device_name)
 		self.seq.SetTempo(tempo)
 		self.instruments = []
-		#~ for channel in channels_to_add:
-			#~ print channel
-			#~ self.AddInstrument(channel[0], channel[1], channel[2])
 	
 	def Start(self):
 		self.seq.PlayBar()
@@ -48,13 +45,12 @@ class Ethestra():
 			
 	def FinishedBar(self, e):
 		for instrument in self.instruments:
-			#print instrument.chan, instrument.name, instrument.packet_count, instrument.channel.pattern
 			instrument.history.append(instrument.packet_count)
 			if len(instrument.history) > instrument.history_length:
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
-			print instrument.history, instrument.packet_ave
+			print instrument.history, instrument.packet_ave, instrument.pattern
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
@@ -87,6 +83,10 @@ class Ethestra():
 			else:
 				self.channel.pattern = pattern
 			print self.chan, self.channel.pattern
+			
+		@property
+		def pattern(self):
+			return self.channel.pattern
 			
 		def ResetPacketCount(self):
 			self.packet_count = 0
