@@ -50,7 +50,7 @@ class Ethestra():
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
-			print instrument.history, instrument.packet_ave, instrument.pattern
+			#~ print instrument.history, instrument.packet_ave, instrument.pattern
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
@@ -62,6 +62,15 @@ class Ethestra():
 		
 	def AddInstrument(self, chan, name, filter, pattern=None):
 		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern))		
+
+	def DeleteInstrument(self, chan):
+		if chan == self.seq.control_channel:
+			raise self.seq.DeleteControl(chan)
+		else:
+			for i in self.instruments:
+				if i.chan == chan:
+					self.seq.DeleteChannel(chan)
+					self.instruments.remove(i)
 	
 	class Instrument():
 		def __init__(self, seq, chan, name, filter, pattern):

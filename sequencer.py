@@ -68,7 +68,6 @@ class Seq(gobject.GObject):
 			for i in self.channels:
 				if i.channel == chan:
 					self.channels.remove(i)
-		"Not Yet Implemented"
 
 	def PlayBar(self): 
 		for channel in self.channels:
