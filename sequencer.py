@@ -70,30 +70,7 @@ class Seq(gobject.GObject):
 					self.channels.remove(i)
 		"Not Yet Implemented"
 
-	def PlayBar(self):
-		"""
-		This code implemented a single scheduler for notes, but this 
-		does not work if the bars are different lengths, which could
-		be the case
-
-		temp_channel_data = []
-		for channel in self.channels:
-			temp_channel_data.append([channel.channel, channel.pattern])
-		flag = 1
-		while flag == 1:
-			for channel_data in temp_channel_data:
-				flag = 0
-				if len(channel_data[1]) != 0:
-					flag = 1
-					note = channel_data[1].pop(0)
-					current_channel = self.GetChannel(channel_data[0])
-					
-					gobject.timeout_add(current_channel.TimeForBeat(note[0]), current_channel.PlayNote, note[1], note[2])
-
-					print note
-		gobject.timeout_add(current_channel.TimeForBeat(current_channel.bar_length), self.PlayBar)
-		"""
-		
+	def PlayBar(self): 
 		for channel in self.channels:
 			channel.PlayBar()
 		
@@ -156,10 +133,7 @@ class Seq(gobject.GObject):
 		def __init__(self, device, channel, tempo, name="Blank", modable=1):
 			self.name = name
 			self.modable = modable
-			if channel == 10:
-				self.pattern = DRUM_PATTERN
-			else:
-				self.pattern = BASIC_PATTERN
+			self.pattern = []
 			self.tempo = tempo
 			self.channel = channel
 			self.device = device
@@ -172,7 +146,6 @@ class Seq(gobject.GObject):
 			self.transpose = 0
 			self.tran_mod = 0
 			gobject.GObject.__init__(self)
-
 			
 		def TestPlay(self):
 			self.device.Write(0x90+self.channel-1,0x50+self.transpose+self.tran_mod,0x60)
@@ -188,7 +161,6 @@ class Seq(gobject.GObject):
 		def PlayBar(self):
 			if self.mute == 0:
 				for note in self.pattern:
-					#print self.TimeForBeat(note[0])
 					gobject.timeout_add(int(self.TimeForBeat(note[0])), self.PlayNote, note[1] + self.transpose + self.tran_mod, note[2], note[3])
 			gobject.timeout_add(int(self.TimeForBeat(self.bar_res)) * self.bar_length, self.PlayBar)
 			self.emit('bar-end')

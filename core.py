@@ -77,6 +77,11 @@ class Ethestra():
 			self.history = []
 			seq.AddChannel(chan, name=name)
 			self.channel = seq.GetChannel(chan)
+			if chan == 10:
+				self.channel.pattern = sequencer.DRUM_PATTERN
+			else:
+				self.channel.pattern = sequencer.BASIC_PATTERN
+			print self.chan, self.channel.pattern
 			
 		def ResetPacketCount(self):
 			self.packet_count = 0
