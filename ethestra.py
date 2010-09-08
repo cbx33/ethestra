@@ -6,8 +6,8 @@ import core
 # Add Drum Channel handling
 # Make ReturnNote deploy note pitch too
 
-channels_to_add = [
-(1, "ARP Instrument", "IS ARP"),
-(2, "TCP Instrument", "IS TCP"),
-(10, "TCP Instrument", "IS TCP"),]
-ethestra = core.Ethestra("ZynAddSubFX", channels_to_add, tempo=100)
+ethestra = core.Ethestra("ZynAddSubFX", tempo=100)
+ethestra.AddInstrument(1, "ARP Instrument", "IS ARP", pattern=[])
+ethestra.AddInstrument(2, "ARP Instrument", "IS ARP OR IS TCP", pattern=[])
+ethestra.AddInstrument(10, "ARP Instrument", "IS TCP", pattern=[])
+ethestra.Start()

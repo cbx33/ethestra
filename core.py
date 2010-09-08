@@ -10,7 +10,7 @@ import quantization as qtz
 DISABLE_SNIFFER = 0
 	
 class Ethestra():
-	def __init__(self, device_name, channels_to_add, tempo = 100):
+	def __init__(self, device_name, tempo = 100):
 		gobject.threads_init()
 		gobject.io_add_watch(sys.stdin,
                      gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
@@ -19,9 +19,11 @@ class Ethestra():
 		self.seq = sequencer.Seq(device_name)
 		self.seq.SetTempo(tempo)
 		self.instruments = []
-		for channel in channels_to_add:
-			print channel
-			self.AddInstrument(channel[0], channel[1], channel[2])
+		#~ for channel in channels_to_add:
+			#~ print channel
+			#~ self.AddInstrument(channel[0], channel[1], channel[2])
+	
+	def Start(self):
 		self.seq.PlayBar()
 		self.seq.connect("bar-fin", self.FinishedBar)
 		if not DISABLE_SNIFFER:
@@ -50,7 +52,7 @@ class Ethestra():
 			instrument.history.append(instrument.packet_count)
 			if len(instrument.history) > instrument.history_length:
 				instrument.history.pop(0)
-			instrument.packet_ave = sum(instrument.history) / instrument.history_length
+			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
 			print instrument.history, instrument.packet_ave
 		
@@ -62,11 +64,11 @@ class Ethestra():
 				#~ instrument.channel.pattern.append((note_position, 0x50, 0x60, 4))
 				instrument.packet_count += 1
 		
-	def AddInstrument(self, chan, name, filter):
-		self.instruments.append(self.Instrument(self.seq, chan, name, filter))		
+	def AddInstrument(self, chan, name, filter, pattern=None):
+		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern))		
 	
 	class Instrument():
-		def __init__(self, seq, chan, name, filter):
+		def __init__(self, seq, chan, name, filter, pattern):
 			self.history_length = 5
 			self.chan = chan
 			self.name = name
@@ -77,10 +79,13 @@ class Ethestra():
 			self.history = []
 			seq.AddChannel(chan, name=name)
 			self.channel = seq.GetChannel(chan)
-			if chan == 10:
-				self.channel.pattern = sequencer.DRUM_PATTERN
+			if pattern == None:
+				if chan == 10:
+					self.channel.pattern = sequencer.DRUM_PATTERN
+				else:
+					self.channel.pattern = sequencer.BASIC_PATTERN
 			else:
-				self.channel.pattern = sequencer.BASIC_PATTERN
+				self.channel.pattern = pattern
 			print self.chan, self.channel.pattern
 			
 		def ResetPacketCount(self):
