@@ -52,12 +52,12 @@ class Ethestra():
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
 			note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes) + DEFAULT_ROOT_NOTE + instrument.transpose
-			note_position = qtz.ReturnNotePosition(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
+			note_position = qtz.ReturnNotePosition(bar_length = instrument.bar_length, bar_res = instrument.bar_res)
 			note_velocity = qtz.ReturnNoteVelocity(instrument.velocity_deviation) + 96
 			try:
-				note_length = qtz.ReturnNoteLength(float(instrument.history[len(instrument.history) - 1]) / float(instrument.packet_ave), instrument.channel.note_length, instrument.channel.bar_length)
+				note_length = qtz.ReturnNoteLength(float(instrument.history[len(instrument.history) - 1]) / float(instrument.packet_ave), instrument.note_length, instrument.bar_length)
 			except ZeroDivisionError:
-				note_length = qtz.ReturnNoteLength(0, instrument.channel.note_length, instrument.channel.bar_length)
+				note_length = qtz.ReturnNoteLength(0, instrument.note_length, instrument.bar_length)
 			print note_length , "**"
 			if note_length == 0:
 				note_length = 1
@@ -109,6 +109,18 @@ class Ethestra():
 		@property
 		def pattern(self):
 			return self.channel.pattern
+			
+		@property
+		def bar_length(self):
+			return self.channel.bar_length
+			
+		@property
+		def bar_res(self):
+			return self.channel.bar_res
+
+		@property
+		def note_length(self):
+			return self.channel.note_length
 			
 		def ResetPacketCount(self):
 			self.packet_count = 0
