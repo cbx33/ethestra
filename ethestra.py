@@ -3,7 +3,6 @@ import Ethestra.core as core
 #TODO
 # Add trigger filters which make drastic change, such as reorder instruments
 #	and have a defined cool-off period to prevent multiple activations
-# Make ReturnNote deploy note pitch too
 
 ethestra = core.Ethestra("ZynAddSubFX", tempo=100)
 ethestra.AddInstrument(1, "ARP Instrument", "IS ARP", pattern=None)
