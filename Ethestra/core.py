@@ -51,9 +51,14 @@ class Ethestra():
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
-			note_pitch = DEFAULT_ROOT_NOTE + instrument.transpose + qtz.ReturnNotePitch(notes = instrument.keynotes)
+			note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes) + DEFAULT_ROOT_NOTE + instrument.transpose
 			note_position = qtz.ReturnNotePosition(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
-			instrument.channel.pattern.append((note_position, note_pitch, 0x60, 4))			
+			note_velocity = qtz.ReturnNoteVelocity(instrument.velocity_deviation) + 96
+			try:
+				note_length = qtz.ReturnNoteLength(float(instrument.history[len(instrument.history) - 1]) / float(instrument.packet_ave), instrument.channel.bar_res)
+			except ZeroDivisionError:
+				note_length = qtz.ReturnNoteLength(0, instrument.channel.bar_res)
+			instrument.channel.pattern.append((note_position, note_pitch, note_velocity, 4))			
 			print instrument.history, instrument.packet_ave, instrument.pattern, note_pitch, note_position
 		
 	def PacketHandler(self, pkt):
@@ -62,8 +67,8 @@ class Ethestra():
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
 				instrument.packet_count += 1
 		
-	def AddInstrument(self, chan, name, filter, pattern=None, transpose = 0):
-		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern, transpose))		
+	def AddInstrument(self, chan, name, filter, pattern=None, transpose = 0, vel_dev = 8):
+		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern, transpose, vel_dev))		
 
 	def DeleteInstrument(self, chan):
 		if chan == self.seq.control_channel:
@@ -75,7 +80,8 @@ class Ethestra():
 					self.instruments.remove(i)
 	
 	class Instrument():
-		def __init__(self, seq, chan, name, filter, pattern, transpose):
+		def __init__(self, seq, chan, name, filter, pattern, transpose, vel_dev):
+			self.velocity_deviation = vel_dev
 			self.transpose = transpose
 			self.history_length = 5
 			self.chan = chan

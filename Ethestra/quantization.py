@@ -31,6 +31,15 @@ def ReturnNotePitch(mappings = DEFAULT_PITCH_MAPPINGS, notes = []):
 			else:
 				return notes[int(len(notes) * p)]
 	
+def ReturnNoteVelocity(vel_dev):
+	p = random.random()
+	return (int(p * vel_dev) - (vel_dev / 2))
+	
+def ReturnNoteLength(percen, bar_res):
+	if percen == 0:
+		percen = 0.5
+	return bar_res * percen
+		
 	
 if __name__ == '__main__':
 	notes = {}
