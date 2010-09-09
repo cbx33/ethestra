@@ -1,4 +1,4 @@
-import core
+import Ethestra.core as core
 
 #TODO
 # Add trigger filters which make drastic change, such as reorder instruments
