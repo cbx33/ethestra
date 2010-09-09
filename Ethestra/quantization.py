@@ -35,10 +35,11 @@ def ReturnNoteVelocity(vel_dev):
 	p = random.random()
 	return (int(p * vel_dev) - (vel_dev / 2))
 	
-def ReturnNoteLength(percen, bar_res):
+def ReturnNoteLength(percen, note_length, bar_res):
 	if percen == 0:
 		percen = 0.5
-	return bar_res * percen
+	print note_length / percen * bar_res
+	return note_length / percen * bar_res
 		
 	
 if __name__ == '__main__':
