@@ -1,7 +1,8 @@
 import math
 import random
 
-DEFAULT_MAPPINGS = [(0.99, 1.0, 1), (0.95, 0.99, 4), (0.7, 0.95, 8), (0, 0.7, 16)]
+DEFAULT_POSITION_MAPPINGS = [(0.99, 1.0, 1), (0.95, 0.99, 4), (0.7, 0.95, 8), (0, 0.7, 16)]
+DEFAULT_PITCH_MAPPINGS = [(0, 0.2, None), (0.2, 1, "chord")]
 DEBUG = 0
 
 def __process_mod_stream(p, quant):
@@ -12,7 +13,7 @@ def __process_mod_stream(p, quant):
 		print p, i, di, p+di, p - di
 	return p - di
 
-def ReturnNotePosition(mappings = DEFAULT_MAPPINGS, bar_length = 4, bar_res = 16):
+def ReturnNotePosition(mappings = DEFAULT_POSITION_MAPPINGS, bar_length = 4, bar_res = 16):
 
 	p = random.random() * bar_res * bar_length
 	j = random.random()
@@ -20,6 +21,16 @@ def ReturnNotePosition(mappings = DEFAULT_MAPPINGS, bar_length = 4, bar_res = 16
 		if j >= map[0] and j < map[1]:
 			notepos = __process_mod_stream(p, map[2])
 	return notepos
+	
+def ReturnNotePitch(mappings = DEFAULT_PITCH_MAPPINGS, notes = []):
+	p = random.random()
+	for map in mappings:
+		if p >= map[0] and p < map[1]:
+			if map[2] == None:
+				return int(p * 12)
+			else:
+				return notes[int(len(notes) * p)]
+	
 	
 if __name__ == '__main__':
 	notes = {}
