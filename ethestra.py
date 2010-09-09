@@ -3,7 +3,6 @@ import core
 #TODO
 # Add trigger filters which make drastic change, such as reorder instruments
 #	and have a defined cool-off period to prevent multiple activations
-# Add Drum Channel handling
 # Make ReturnNote deploy note pitch too
 
 ethestra = core.Ethestra("ZynAddSubFX", tempo=100)
