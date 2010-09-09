@@ -8,6 +8,7 @@ import signal
 import quantization as qtz
 
 DISABLE_SNIFFER = 0
+DEFAULT_ROOT_NOTE = 78
 	
 class Ethestra():
 	def __init__(self, device_name, tempo = 100):
@@ -50,18 +51,19 @@ class Ethestra():
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
-			#~ print instrument.history, instrument.packet_ave, instrument.pattern
+			note_pitch = DEFAULT_ROOT_NOTE + instrument.transpose + qtz.ReturnNotePitch(notes = instrument.keynotes)
+			note_position = qtz.ReturnNotePosition(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
+			instrument.channel.pattern.append((note_position, note_pitch, 0x60, 4))			
+			print instrument.history, instrument.packet_ave, instrument.pattern, note_pitch, note_position
 		
 	def PacketHandler(self, pkt):
 		print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
-				#~ note_position = qtz.ReturnNotePosition(bar_length = instrument.channel.bar_length, bar_res = instrument.channel.bar_res)
-				#~ instrument.channel.pattern.append((note_position, 0x50, 0x60, 4))
 				instrument.packet_count += 1
 		
-	def AddInstrument(self, chan, name, filter, pattern=None):
-		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern))		
+	def AddInstrument(self, chan, name, filter, pattern=None, transpose = 0):
+		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern, transpose))		
 
 	def DeleteInstrument(self, chan):
 		if chan == self.seq.control_channel:
@@ -73,7 +75,8 @@ class Ethestra():
 					self.instruments.remove(i)
 	
 	class Instrument():
-		def __init__(self, seq, chan, name, filter, pattern):
+		def __init__(self, seq, chan, name, filter, pattern, transpose):
+			self.transpose = transpose
 			self.history_length = 5
 			self.chan = chan
 			self.name = name
@@ -82,6 +85,7 @@ class Ethestra():
 			self.packet_count = 0
 			self.packet_ave = 0
 			self.history = []
+			self.keynotes = [0, 4, 7]
 			seq.AddChannel(chan, name=name)
 			self.channel = seq.GetChannel(chan)
 			if pattern == None:
