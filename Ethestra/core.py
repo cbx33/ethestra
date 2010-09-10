@@ -8,7 +8,7 @@ import signal
 import quantization as qtz
 
 DISABLE_SNIFFER = 0
-DEFAULT_ROOT_NOTE = 78
+DEFAULT_ROOT_NOTE = 50
 	
 class Ethestra():
 	def __init__(self, device_name, tempo = 100, chords = [["A","M",4]]):
@@ -72,7 +72,7 @@ class Ethestra():
 			if len(instrument.history) > instrument.history_length:
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
-			instrument.ResetPacketCount()
+			
 			
 			#Get rid of one
 			if instrument.packet_count < instrument.packet_ave:
@@ -92,14 +92,17 @@ class Ethestra():
 					note_length = qtz.ReturnNoteLength(0, instrument.note_length, instrument.bar_length)
 				if note_length == 0:
 					note_length = 1
-				instrument.relative_pat.append((note_position, note_pitch, note_velocity, int(note_length)))
-				#new_note = (note_position, note_pitch, note_velocity, int(note_length))
-				instrument.channel.pattern = []
-				for note in instrument.relative_pat:
-					instrument.channel.pattern.append((note[0], note[1] + qtz.NOTES[current_chord[0].lower()] + DEFAULT_ROOT_NOTE + instrument.transpose, note[2], note[3]))
-				print instrument.channel.pattern, instrument.relative_pat
+					
+				print instrument.packet_count, instrument.packet_ave, instrument.history
+				if instrument.packet_count > instrument.packet_ave:
+					instrument.relative_pat.append((note_position, note_pitch, note_velocity, int(note_length)))
+					#new_note = (note_position, note_pitch, note_velocity, int(note_length))
+					instrument.channel.pattern = []
+					for note in instrument.relative_pat:
+						instrument.channel.pattern.append((note[0], note[1] + qtz.NOTES[current_chord[0].lower()] + DEFAULT_ROOT_NOTE + instrument.transpose, note[2], note[3]))
+					print instrument.channel.pattern, instrument.relative_pat
 			#print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
-
+			instrument.ResetPacketCount()
 		self.history.append(bar_packets)
 		if len(self.history) > self.history_length:
 			self.history.pop(0)
@@ -121,7 +124,7 @@ class Ethestra():
 		self.packet_count = 0
 		
 	def PacketHandler(self, pkt):
-		#print pkt.summary()
+		print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
 				instrument.packet_count += 1
