@@ -73,9 +73,15 @@ class Ethestra():
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
+			
+			#Get rid of one
 			if instrument.packet_count < instrument.packet_ave:
 				instrument.pattern.pop(0)
+				
 			if instrument.modable:
+				current_chord = instrument.compiled_chords[instrument.chords_pos]
+				instrument.keynotes = [c_note + qtz.NOTES[current_chord[0].lower()] for c_note in qtz.CHORD_LIB[current_chord[1]]]
+				print instrument.keynotes
 				note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes) + DEFAULT_ROOT_NOTE + instrument.transpose
 				note_position = qtz.ReturnNotePosition(bar_length = instrument.bar_length, bar_res = instrument.bar_res)
 				note_velocity = qtz.ReturnNoteVelocity(instrument.velocity_deviation) + 96
