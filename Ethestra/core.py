@@ -75,7 +75,8 @@ class Ethestra():
 			
 			
 			#Get rid of one
-			if instrument.packet_count < instrument.packet_ave:
+			#if instrument.packet_count < instrument.packet_ave:
+			if len(instrument.relative_pat) > 10:
 				instrument.relative_pat.pop(0)
 				instrument.channel.pattern.pop(0)
 				
@@ -100,7 +101,7 @@ class Ethestra():
 					instrument.channel.pattern = []
 					for note in instrument.relative_pat:
 						instrument.channel.pattern.append((note[0], note[1] + qtz.NOTES[current_chord[0].lower()] + DEFAULT_ROOT_NOTE + instrument.transpose, note[2], note[3]))
-					print instrument.channel.pattern, instrument.relative_pat
+				print instrument.channel.pattern, instrument.relative_pat
 			#print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
 			instrument.ResetPacketCount()
 		self.history.append(bar_packets)
