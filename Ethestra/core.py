@@ -59,6 +59,10 @@ class Ethestra():
 			if instrument.chords_pos >= len(instrument.compiled_chords):
 				instrument.chords_pos = 0
 			print instrument.chan, instrument.compiled_chords[instrument.chords_pos]
+			
+			#Are going to have to introduce new keylist AND modify old pattern keys
+			
+			#instrument.keynotes = 
 			#Fix up packet counts
 			instrument.history.append(instrument.packet_count)
 			bar_packets += instrument.packet_count
