@@ -8,7 +8,7 @@ import signal
 import quantization as qtz
 
 DISABLE_SNIFFER = 0
-DEFAULT_ROOT_NOTE = 78
+DEFAULT_ROOT_NOTE = 50
 	
 class Ethestra():
 	def __init__(self, device_name, tempo = 100, chords = [["A","M",4]]):
@@ -63,15 +63,28 @@ class Ethestra():
 			#Are going to have to introduce new keylist AND modify old pattern keys
 			#[note + base for note in keynotes]
 			#instrument.keynotes = 
+			#Maybe should store the notes in the pattern as 0,4,7 as opposed to absolutes
+			
+			
 			#Fix up packet counts
 			instrument.history.append(instrument.packet_count)
 			bar_packets += instrument.packet_count
 			if len(instrument.history) > instrument.history_length:
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
-			instrument.ResetPacketCount()
+			
+			
+			#Get rid of one
+			#if instrument.packet_count < instrument.packet_ave:
+			if len(instrument.relative_pat) > 10:
+				instrument.relative_pat.pop(0)
+				instrument.channel.pattern.pop(0)
+				
 			if instrument.modable:
-				note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes) + DEFAULT_ROOT_NOTE + instrument.transpose
+				current_chord = instrument.compiled_chords[instrument.chords_pos]
+				instrument.keynotes = [c_note + qtz.NOTES[current_chord[0].lower()] for c_note in qtz.CHORD_LIB[current_chord[1]]]
+				print instrument.keynotes
+				note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes)
 				note_position = qtz.ReturnNotePosition(bar_length = instrument.bar_length, bar_res = instrument.bar_res)
 				note_velocity = qtz.ReturnNoteVelocity(instrument.velocity_deviation) + 96
 				try:
@@ -80,9 +93,17 @@ class Ethestra():
 					note_length = qtz.ReturnNoteLength(0, instrument.note_length, instrument.bar_length)
 				if note_length == 0:
 					note_length = 1
-				instrument.channel.pattern.append((note_position, note_pitch, note_velocity, int(note_length)))			
+					
+				print instrument.packet_count, instrument.packet_ave, instrument.history
+				if instrument.packet_count > instrument.packet_ave:
+					instrument.relative_pat.append((note_position, note_pitch, note_velocity, int(note_length)))
+					#new_note = (note_position, note_pitch, note_velocity, int(note_length))
+					instrument.channel.pattern = []
+					for note in instrument.relative_pat:
+						instrument.channel.pattern.append((note[0], note[1] + qtz.NOTES[current_chord[0].lower()] + DEFAULT_ROOT_NOTE + instrument.transpose, note[2], note[3]))
+				print instrument.channel.pattern, instrument.relative_pat
 			#print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
-
+			instrument.ResetPacketCount()
 		self.history.append(bar_packets)
 		if len(self.history) > self.history_length:
 			self.history.pop(0)
@@ -104,7 +125,7 @@ class Ethestra():
 		self.packet_count = 0
 		
 	def PacketHandler(self, pkt):
-		#print pkt.summary()
+		print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
 				instrument.packet_count += 1
@@ -125,6 +146,7 @@ class Ethestra():
 	
 	class Instrument():
 		def __init__(self, seq, chan, name, filter, pattern, transpose, vel_dev, chords):
+			self.root_note = DEFAULT_ROOT_NOTE
 			self.chords = chords
 			self.chords_pos = 0
 			self.compiled_chords = []
@@ -139,6 +161,7 @@ class Ethestra():
 			self.packet_ave = 0
 			self.history = []
 			self.keynotes = [0, 4, 7]
+			self.relative_pat = []
 			seq.AddChannel(chan, name=name)
 			self.channel = seq.GetChannel(chan)
 			if pattern == None:

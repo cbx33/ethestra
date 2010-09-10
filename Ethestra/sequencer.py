@@ -89,9 +89,11 @@ class Seq(gobject.GObject):
 		
 	def SetTempo(self, tempo):
 		self.tempo = tempo
+		for channel in self.channels:
+			channel.tempo = self.tempo
 		
 	def GetTempo(self):
-		return self.tempo
+		return self.tempo	
 		
 	class DeleteControl(Exception):
 		def __init__(self, value):
@@ -162,6 +164,8 @@ class Seq(gobject.GObject):
 				for note in self.pattern:
 					gobject.timeout_add(int(self.TimeForBeat(note[0])), self.PlayNote, note[1] + self.transpose + self.tran_mod, note[2], note[3])
 			gobject.timeout_add(int(self.TimeForBeat(self.bar_res)) * self.bar_length, self.PlayBar)
+			print self.TimeForBeat(self.bar_res), " Bar time"
+			print self.tempo, " RealTempo"
 			self.emit('bar-end')
 				
 		def PlayNote(self, note, velo, length):
