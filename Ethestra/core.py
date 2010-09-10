@@ -11,7 +11,7 @@ DISABLE_SNIFFER = 0
 DEFAULT_ROOT_NOTE = 78
 	
 class Ethestra():
-	def __init__(self, device_name, tempo = 100):
+	def __init__(self, device_name, tempo = 100, chords = [["A","M",4]]):
 		gobject.threads_init()
 		gobject.io_add_watch(sys.stdin,
                      gobject.IO_IN | gobject.IO_ERR | gobject.IO_HUP,
@@ -24,6 +24,7 @@ class Ethestra():
 		self.history = []
 		self.packet_count = 0
 		self.packet_ave = 0
+		self.chords = chords
 	
 	def Start(self):
 		self.seq.PlayBar()
@@ -93,8 +94,10 @@ class Ethestra():
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
 				instrument.packet_count += 1
 		
-	def AddInstrument(self, chan, name, filter, pattern=None, transpose = 0, vel_dev = 8):
-		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern, transpose, vel_dev))		
+	def AddInstrument(self, chan, name, filter, pattern=None, transpose = 0, vel_dev = 8, chords = []):
+		if chords == []:
+			chords = self.chords
+		self.instruments.append(self.Instrument(self.seq, chan, name, filter, pattern, transpose, vel_dev, chords))		
 
 	def DeleteInstrument(self, chan):
 		if chan == self.seq.control_channel:
@@ -106,7 +109,8 @@ class Ethestra():
 					self.instruments.remove(i)
 	
 	class Instrument():
-		def __init__(self, seq, chan, name, filter, pattern, transpose, vel_dev):
+		def __init__(self, seq, chan, name, filter, pattern, transpose, vel_dev, chords):
+			self.chords = chords
 			self.velocity_deviation = vel_dev
 			self.transpose = transpose
 			self.history_length = 5

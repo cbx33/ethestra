@@ -4,6 +4,8 @@ import random
 DEFAULT_POSITION_MAPPINGS = [(0.99, 1.0, 1), (0.95, 0.99, 4), (0.7, 0.95, 8), (0, 0.7, 16)]
 DEFAULT_PITCH_MAPPINGS = [(0, 0.2, None), (0.2, 1, "chord")]
 DEBUG = 0
+NOTES = {"a":0,"a#":1,"b":2,"c":3,"c#":4,"d":5,"d#":6,"e":7,"f":8,"f#":9,"g":10,"g#":11}
+CHORD_LIB = {"M":[0,4,7], "m":[0,3,7], "aug":[0,4,8], "dim":[0,3,6], "7":[0,10,4,7]}
 
 def __process_mod_stream(p, quant):
 	di = p % quant
