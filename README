@@ -1,0 +1,30 @@
+To run ethestra you will need a few dependencies.
+
+The first is portmidizero which can be found here 
+
+http://pypi.python.org/packages/source/p/portmidizero/portmidizero-0.1.tar.gz
+
+The second item you will need is scapy, which should be installable via
+the normal methods.
+
+The third item is ZynAddSubFX, which again should be available from
+normal channels.
+
+There are two patches that you need to make, one to portmidizero and the 
+other to scapy.  portmidizero, because on running it, it crashed on my
+ubuntu box and refused to do anything because of an invalid type.  Scapy 
+requires a patch to get the sniffer thread to quit.  This patch was first 
+proposed on google code.
+
+Once those patches have been applied, you will need to run up ZynAddSubFX.
+This is the part that actually generates the noise.  You will see a .xmz
+file in the Ethestra source tree.  This has parameters for ZynAddSubFX that
+work well with the Ethestra defaults.  This can be loaded from within ZynAddSubFX.
+
+Then run ethestra using
+
+sudo python ethestra.py
+
+We need to run as root to allow scapy to read the network traffic.
+
+Enjoy.
