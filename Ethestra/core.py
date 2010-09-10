@@ -70,6 +70,8 @@ class Ethestra():
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
 			instrument.ResetPacketCount()
+			if instrument.packet_count < instrument.packet_ave:
+				instrument.pattern.pop(0)
 			if instrument.modable:
 				note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes) + DEFAULT_ROOT_NOTE + instrument.transpose
 				note_position = qtz.ReturnNotePosition(bar_length = instrument.bar_length, bar_res = instrument.bar_res)
