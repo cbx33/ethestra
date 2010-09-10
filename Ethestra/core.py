@@ -20,6 +20,10 @@ class Ethestra():
 		self.seq = sequencer.Seq(device_name)
 		self.seq.SetTempo(tempo)
 		self.instruments = []
+		self.history_length = 5
+		self.history = []
+		self.packet_count = 0
+		self.packet_ave = 0
 	
 	def Start(self):
 		self.seq.PlayBar()
@@ -45,8 +49,10 @@ class Ethestra():
 			return False
 			
 	def FinishedBar(self, e):
+		bar_packets = 0
 		for instrument in self.instruments:
 			instrument.history.append(instrument.packet_count)
+			bar_packets += instrument.packet_count
 			if len(instrument.history) > instrument.history_length:
 				instrument.history.pop(0)
 			instrument.packet_ave = sum(instrument.history) / len(instrument.history)
@@ -59,14 +65,30 @@ class Ethestra():
 					note_length = qtz.ReturnNoteLength(float(instrument.history[len(instrument.history) - 1]) / float(instrument.packet_ave), instrument.note_length, instrument.bar_length)
 				except ZeroDivisionError:
 					note_length = qtz.ReturnNoteLength(0, instrument.note_length, instrument.bar_length)
-				print note_length , "**"
 				if note_length == 0:
 					note_length = 1
 				instrument.channel.pattern.append((note_position, note_pitch, note_velocity, int(note_length)))			
-			print instrument.history, instrument.packet_ave, instrument.pattern, note_pitch, note_position
+			print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
+		self.history.append(bar_packets)
+		if len(self.history) > self.history_length:
+			self.history.pop(0)
+		print self.history, self.packet_ave, self.history_length
+		self.packet_ave = sum(self.history) / len(self.history)
+		self.ResetPacketCountGlobal()
+		self.packet_count = bar_packets
+
+		#Tempo alteration
+		if self.packet_count > self.packet_ave and self.seq.GetTempo() < 120:
+			self.seq.SetTempo(self.seq.GetTempo() + 3)
+		elif self.packet_count < self.packet_ave and self.seq.GetTempo() > 80:
+			self.seq.SetTempo(self.seq.GetTempo() - 3)
+		print "Tempo", self.seq.GetTempo()
+		
+	def ResetPacketCountGlobal(self):
+		self.packet_count = 0
 		
 	def PacketHandler(self, pkt):
-		print pkt.summary()
+		#print pkt.summary()
 		for instrument in self.instruments:
 			if packetparser.FilterCheck(instrument.compiled_filter, pkt):
 				instrument.packet_count += 1
