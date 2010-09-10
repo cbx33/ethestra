@@ -63,6 +63,9 @@ class Ethestra():
 			#Are going to have to introduce new keylist AND modify old pattern keys
 			#[note + base for note in keynotes]
 			#instrument.keynotes = 
+			#Maybe should store the notes in the pattern as 0,4,7 as opposed to absolutes
+			
+			
 			#Fix up packet counts
 			instrument.history.append(instrument.packet_count)
 			bar_packets += instrument.packet_count
