@@ -1,0 +1,54 @@
+--- sendrecv.py	2008-10-31 21:55:15.000000000 +0000
++++ /usr/share/pyshared/scapy/sendrecv.py	2010-09-02 21:33:56.447022631 +0100
+@@ -510,7 +510,7 @@
+ 
+ 
+ @conf.commands.register
+-def sniff(count=0, store=1, offline=None, prn = None, lfilter=None, L2socket=None, timeout=None, *arg, **karg):
++def sniff(count=0, store=1, offline=None, prn = None, lfilter=None, L2socket=None, timeout=None, stopperTimeout=None, stopper = None, *arg, **karg):
+     """Sniff packets
+ sniff([count=0,] [prn=None,] [store=1,] [offline=None,] [lfilter=None,] + L2ListenSocket args) -> list of packets
+ 
+@@ -524,6 +524,9 @@
+          ex: lfilter = lambda x: x.haslayer(Padding)
+ offline: pcap file to read packets from, instead of sniffing them
+ timeout: stop sniffing after a given time (default: None)
++stopperTimeout: break the select to check the returned value of 
++         stopper() and stop sniffing if needed (select timeout)
++stopper: function returning true or false to stop the sniffing process
+ L2socket: use the provided L2socket
+     """
+     c = 0
+@@ -539,13 +542,31 @@
+     if timeout is not None:
+         stoptime = time.time()+timeout
+     remain = None
++
++    if stopperTimeout is not None:
++        stopperStoptime = time.time()+stopperTimeout
++    remainStopper = None
+     while 1:
+         try:
+             if timeout is not None:
+                 remain = stoptime-time.time()
+                 if remain <= 0:
+                     break
+-            sel = select([s],[],[],remain)
++            if stopperTimeout is not None:
++                remainStopper = stopperStoptime-time.time()
++                if remainStopper <=0:
++                    if stopper and stopper():
++                        break
++                    stopperStoptime = time.time()+stopperTimeout
++                    remainStopper = stopperStoptime-time.time()
++
++                sel = select([s],[],[],remainStopper)
++                if s not in sel[0]:
++                    if stopper and stopper():
++                        break
++            else:
++                sel = select([s],[],[],remain)
++
+             if s in sel[0]:
+                 p = s.recv(MTU)
+                 if p is None:

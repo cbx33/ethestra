@@ -61,7 +61,7 @@ class Ethestra():
 			print instrument.chan, instrument.compiled_chords[instrument.chords_pos]
 			
 			#Are going to have to introduce new keylist AND modify old pattern keys
-			
+			#[note + base for note in keynotes]
 			#instrument.keynotes = 
 			#Fix up packet counts
 			instrument.history.append(instrument.packet_count)
@@ -92,11 +92,11 @@ class Ethestra():
 		self.packet_count = bar_packets
 
 		#Tempo alteration
-		if self.packet_count > self.packet_ave and self.seq.GetTempo() < 120:
+		if self.packet_count > self.packet_ave and self.seq.GetTempo() < 140:
 			self.seq.SetTempo(self.seq.GetTempo() + 3)
-		elif self.packet_count < self.packet_ave and self.seq.GetTempo() > 80:
+		elif self.packet_count < self.packet_ave and self.seq.GetTempo() > 60:
 			self.seq.SetTempo(self.seq.GetTempo() - 3)
-		#print "Tempo", self.seq.GetTempo()
+		print "Tempo", self.seq.GetTempo()
 		
 		
 		
