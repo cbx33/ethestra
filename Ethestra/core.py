@@ -76,7 +76,8 @@ class Ethestra():
 			
 			#Get rid of one
 			if instrument.packet_count < instrument.packet_ave:
-				instrument.pattern.pop(0)
+				instrument.relative_pat.pop(0)
+				instrument.channel.pattern.pop(0)
 				
 			if instrument.modable:
 				current_chord = instrument.compiled_chords[instrument.chords_pos]
