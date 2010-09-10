@@ -51,7 +51,15 @@ class Ethestra():
 			
 	def FinishedBar(self, e):
 		bar_packets = 0
+		
+		#Main Instruments Loop
 		for instrument in self.instruments:
+			#Chord alterations
+			instrument.chords_pos += 1
+			if instrument.chords_pos >= len(instrument.compiled_chords):
+				instrument.chords_pos = 0
+			print instrument.chan, instrument.compiled_chords[instrument.chords_pos]
+			#Fix up packet counts
 			instrument.history.append(instrument.packet_count)
 			bar_packets += instrument.packet_count
 			if len(instrument.history) > instrument.history_length:
@@ -69,11 +77,12 @@ class Ethestra():
 				if note_length == 0:
 					note_length = 1
 				instrument.channel.pattern.append((note_position, note_pitch, note_velocity, int(note_length)))			
-			print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
+			#print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
+
 		self.history.append(bar_packets)
 		if len(self.history) > self.history_length:
 			self.history.pop(0)
-		print self.history, self.packet_ave, self.history_length
+		#print self.history, self.packet_ave, self.history_length
 		self.packet_ave = sum(self.history) / len(self.history)
 		self.ResetPacketCountGlobal()
 		self.packet_count = bar_packets
@@ -83,7 +92,9 @@ class Ethestra():
 			self.seq.SetTempo(self.seq.GetTempo() + 3)
 		elif self.packet_count < self.packet_ave and self.seq.GetTempo() > 80:
 			self.seq.SetTempo(self.seq.GetTempo() - 3)
-		print "Tempo", self.seq.GetTempo()
+		#print "Tempo", self.seq.GetTempo()
+		
+		
 		
 	def ResetPacketCountGlobal(self):
 		self.packet_count = 0
@@ -111,6 +122,8 @@ class Ethestra():
 	class Instrument():
 		def __init__(self, seq, chan, name, filter, pattern, transpose, vel_dev, chords):
 			self.chords = chords
+			self.chords_pos = 0
+			self.compiled_chords = []
 			self.velocity_deviation = vel_dev
 			self.transpose = transpose
 			self.history_length = 5
@@ -132,7 +145,11 @@ class Ethestra():
 					self.channel.pattern = sequencer.BASIC_PATTERN
 			else:
 				self.channel.pattern = pattern
-			print self.chan, self.channel.pattern
+			#print self.chan, self.channel.pattern
+			for chord in chords:
+				for i in range(chord[2]):
+					self.compiled_chords.append(chord[:2])
+
 			
 		@property
 		def pattern(self):

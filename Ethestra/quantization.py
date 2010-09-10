@@ -16,7 +16,6 @@ def __process_mod_stream(p, quant):
 	return p - di
 
 def ReturnNotePosition(mappings = DEFAULT_POSITION_MAPPINGS, bar_length = 4, bar_res = 16):
-
 	p = random.random() * bar_res * bar_length
 	j = random.random()
 	for map in mappings:
@@ -40,7 +39,7 @@ def ReturnNoteVelocity(vel_dev):
 def ReturnNoteLength(percen, note_length, bar_res):
 	if percen == 0:
 		percen = 0.5
-	print note_length / percen * bar_res
+	#print note_length / percen * bar_res
 	return note_length / percen * bar_res
 		
 	
