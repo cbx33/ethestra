@@ -82,7 +82,7 @@ class Ethestra():
 				current_chord = instrument.compiled_chords[instrument.chords_pos]
 				instrument.keynotes = [c_note + qtz.NOTES[current_chord[0].lower()] for c_note in qtz.CHORD_LIB[current_chord[1]]]
 				print instrument.keynotes
-				note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes) + DEFAULT_ROOT_NOTE + instrument.transpose
+				note_pitch = qtz.ReturnNotePitch(notes = instrument.keynotes)
 				note_position = qtz.ReturnNotePosition(bar_length = instrument.bar_length, bar_res = instrument.bar_res)
 				note_velocity = qtz.ReturnNoteVelocity(instrument.velocity_deviation) + 96
 				try:
@@ -91,7 +91,12 @@ class Ethestra():
 					note_length = qtz.ReturnNoteLength(0, instrument.note_length, instrument.bar_length)
 				if note_length == 0:
 					note_length = 1
-				instrument.channel.pattern.append((note_position, note_pitch, note_velocity, int(note_length)))			
+				instrument.relative_pat.append((note_position, note_pitch, note_velocity, int(note_length)))
+				#new_note = (note_position, note_pitch, note_velocity, int(note_length))
+				instrument.channel.pattern = []
+				for note in instrument.relative_pat:
+					instrument.channel.pattern.append((note[0], note[1] + qtz.NOTES[current_chord[0].lower()] + DEFAULT_ROOT_NOTE + instrument.transpose, note[2], note[3]))
+				print instrument.channel.pattern, instrument.relative_pat
 			#print instrument.history, instrument.packet_ave, instrument.history_length, instrument.pattern, note_pitch, note_position
 
 		self.history.append(bar_packets)
@@ -136,6 +141,7 @@ class Ethestra():
 	
 	class Instrument():
 		def __init__(self, seq, chan, name, filter, pattern, transpose, vel_dev, chords):
+			self.root_note = DEFAULT_ROOT_NOTE
 			self.chords = chords
 			self.chords_pos = 0
 			self.compiled_chords = []
@@ -150,6 +156,7 @@ class Ethestra():
 			self.packet_ave = 0
 			self.history = []
 			self.keynotes = [0, 4, 7]
+			self.relative_pat = []
 			seq.AddChannel(chan, name=name)
 			self.channel = seq.GetChannel(chan)
 			if pattern == None:
